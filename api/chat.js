@@ -1,11 +1,9 @@
-export const config = { runtime: 'edge' }
-
-export default async function handler(req) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 })
+    return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { messages, system } = await req.json()
+  const { messages, system } = req.body
 
   const contents = messages.map(m => ({
     role: m.role === 'assistant' ? 'model' : 'user',
@@ -25,10 +23,9 @@ export default async function handler(req) {
   )
 
   const data = await response.json()
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "Sorry, I couldn't respond right now."
 
-  // ✅ Return the full raw response so we can see what Gemini is saying
-  return new Response(JSON.stringify(data), {
-    status: response.status,
-    headers: { 'Content-Type': 'application/json' }
+  return res.status(200).json({
+    content: [{ type: 'text', text }]
   })
 }
