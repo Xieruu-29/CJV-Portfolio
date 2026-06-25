@@ -23,9 +23,7 @@ export default async function handler(req, res) {
   )
 
   const data = await response.json()
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "Sorry, I couldn't respond right now."
 
-  return res.status(200).json({
-    content: [{ type: 'text', text }]
-  })
+  // Return full raw Gemini response so we can debug
+  return res.status(200).json(data)
 }
