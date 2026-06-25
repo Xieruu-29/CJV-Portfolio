@@ -3,6 +3,7 @@
     <div class="container">
       <span class="section-eyebrow reveal sector-anim">02 — Projects</span>
       <h2 class="section-title reveal">What I've Built</h2>
+      <p class="section-subtitle reveal">Team Projects and Solo Projects</p>
 
       <div class="projects-grid">
         <div v-for="(project, i) in projects" :key="i"
@@ -103,6 +104,17 @@ onMounted(() => {
 
 <style scoped>
 .projects-section { background: var(--bg-2); }
+
+.section-title { margin-bottom: 10px; }
+
+.section-subtitle {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text-muted);
+  margin-bottom: 44px;
+}
 
 .projects-grid {
   display: grid;
