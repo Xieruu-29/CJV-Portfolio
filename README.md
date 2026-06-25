@@ -31,4 +31,4 @@ npm run preview # preview the production build
 ```
 
 ## Vercel Link
-https://vercel.com/chris-jasper-velitarios-projects/cjv-portfolio
+https://cjv-portfolio.vercel.app/
