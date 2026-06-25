@@ -74,21 +74,74 @@
         </div>
       </nav>
 
-      <button class="nav-hamburger" @click="menuOpen = !menuOpen" :aria-expanded="menuOpen">
+      <button class="nav-hamburger" @click="toggleMobileMenu" :aria-expanded="menuOpen">
         <span></span><span></span><span></span>
       </button>
     </div>
 
     <div :class="['mobile-menu', { open: menuOpen }]">
-      <p class="mobile-section-label">Navigate</p>
-      <a v-for="link in navLinks" :key="link.href" :href="link.href" @click="menuOpen = false" class="mobile-link">{{ link.label }}</a>
-      <p class="mobile-section-label">Socials</p>
-      <a v-for="link in socialLinks" :key="link.label" :href="link.url" target="_blank" rel="noopener" @click="menuOpen = false" class="mobile-link">{{ link.label }}</a>
-      <p class="mobile-section-label">Hire Me</p>
-      <a href="/docs/velitario-resume.pdf" download class="mobile-link mobile-link--cta" @click="menuOpen = false">Download Resume</a>
-      <a href="/docs/velitario-cv.pdf" download class="mobile-link mobile-link--cta" @click="menuOpen = false">Download CV</a>
-      <button type="button" class="mobile-link mobile-link--cta mobile-link--btn" @click="handleCoverLetter">Cover Letter (PDF)</button>
-      <a href="mailto:velitariochrisjasper69@gmail.com" class="mobile-link mobile-link--cta" @click="menuOpen = false">Send Email</a>
+      <div class="mobile-menu-inner">
+
+        <!-- Navigate -->
+        <div class="mobile-acc" :class="{ open: mobileOpen === 'nav' }">
+          <button class="mobile-acc-head" @click="toggleMobile('nav')" :aria-expanded="mobileOpen === 'nav'">
+            <span>Navigate</span>
+            <svg class="caret" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="mobile-acc-body">
+            <div class="mobile-acc-body-inner">
+              <a v-for="link in navLinks" :key="link.href" :href="link.href" @click="closeMobile" class="mobile-link">
+                <span class="mobile-link-icon" v-html="link.icon"></span>
+                <span class="mobile-link-title">{{ link.label }}</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Socials -->
+        <div class="mobile-acc" :class="{ open: mobileOpen === 'social' }">
+          <button class="mobile-acc-head" @click="toggleMobile('social')" :aria-expanded="mobileOpen === 'social'">
+            <span>Socials</span>
+            <svg class="caret" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="mobile-acc-body">
+            <div class="mobile-acc-body-inner">
+              <a v-for="link in socialLinks" :key="link.label" :href="link.url" target="_blank" rel="noopener" @click="closeMobile" class="mobile-link">
+                <span class="mobile-link-icon" v-html="link.icon"></span>
+                <span class="mobile-link-text">
+                  <span class="mobile-link-title">{{ link.label }}</span>
+                  <span class="mobile-link-sub">{{ link.sub }}</span>
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hire Me -->
+        <div class="mobile-acc" :class="{ open: mobileOpen === 'hire' }">
+          <button class="mobile-acc-head" @click="toggleMobile('hire')" :aria-expanded="mobileOpen === 'hire'">
+            <span>Hire Me</span>
+            <svg class="caret" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="mobile-acc-body">
+            <div class="mobile-acc-body-inner">
+              <a href="/docs/velitario-resume.pdf" download class="mobile-link mobile-link--cta" @click="closeMobile">
+                <span class="mobile-link-title">Download Resume</span>
+              </a>
+              <a href="/docs/velitario-cv.pdf" download class="mobile-link mobile-link--cta" @click="closeMobile">
+                <span class="mobile-link-title">Download CV</span>
+              </a>
+              <button type="button" class="mobile-link mobile-link--cta" @click="handleCoverLetter">
+                <span class="mobile-link-title">Cover Letter (PDF)</span>
+              </button>
+              <a href="mailto:velitariochrisjasper69@gmail.com" class="mobile-link mobile-link--cta" @click="closeMobile">
+                <span class="mobile-link-title">Send Email</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </header>
 </template>
@@ -97,17 +150,33 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { downloadCoverLetter } from '../utils/generateCoverLetter.js'
 
-const scrolled  = ref(false)
-const menuOpen  = ref(false)
-const openDrop  = ref(null)
-const navWrap   = ref(null)
-const socialWrap = ref(null)
-const hireWrap  = ref(null)
+const scrolled    = ref(false)
+const menuOpen    = ref(false)
+const openDrop    = ref(null)
+const mobileOpen  = ref(null)
+const navWrap     = ref(null)
+const socialWrap  = ref(null)
+const hireWrap    = ref(null)
 
 const handleCoverLetter = () => {
   downloadCoverLetter()
   openDrop.value = null
   menuOpen.value = false
+  mobileOpen.value = null
+}
+
+const toggleMobileMenu = () => {
+  menuOpen.value = !menuOpen.value
+  if (!menuOpen.value) mobileOpen.value = null
+}
+
+const toggleMobile = (name) => {
+  mobileOpen.value = mobileOpen.value === name ? null : name
+}
+
+const closeMobile = () => {
+  menuOpen.value = false
+  mobileOpen.value = null
 }
 
 const navLinks = [
@@ -341,46 +410,127 @@ onUnmounted(() => {
 /* ── Mobile menu ── */
 .mobile-menu {
   display: none;
-  flex-direction: column;
-  background: rgba(0,0,0,0.97);
+  background: var(--bg);
   border-top: 1px solid var(--border);
   max-height: 0;
   overflow: hidden;
   transition: max-height var(--transition-slow);
 }
-.mobile-menu.open { max-height: 600px; }
+.mobile-menu.open {
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+}
 
-.mobile-section-label {
-  font-family: var(--font-mono);
-  font-size: 9px; font-weight: 400;
-  letter-spacing: 0.2em; text-transform: uppercase;
-  color: var(--text-dim); padding: 14px 28px 4px;
+.mobile-menu-inner {
+  padding: 4px 0 24px;
 }
-.mobile-link {
-  font-family: var(--font-display);
-  font-size: 14px; font-weight: 500;
-  color: var(--text-muted);
-  padding: 12px 28px;
-  border-bottom: 1px solid var(--border);
-  transition: color var(--transition-base), background var(--transition-base);
-  display: block;
-}
-.mobile-link:hover { color: var(--text); background: var(--accent-glow); }
-.mobile-link--cta { color: var(--text); }
-.mobile-link--btn {
+
+/* Accordion section */
+.mobile-acc { border-bottom: 1px solid var(--border); }
+.mobile-acc:first-child { border-top: 1px solid var(--border); }
+
+.mobile-acc-head {
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   background: none;
   border: none;
-  text-align: left;
-  font: inherit;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 18px 28px;
+  margin: 0;
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
+  font: inherit;
+  text-align: left;
+  transition: color var(--transition-base);
+}
+.mobile-acc-head:hover,
+.mobile-acc.open .mobile-acc-head { color: var(--text); }
+
+.mobile-acc-head .caret {
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: transform var(--transition-base), opacity var(--transition-base);
+}
+.mobile-acc.open .mobile-acc-head .caret { opacity: 0.9; transform: rotate(180deg); }
+
+/* Collapsible body — grid-rows trick keeps the height fluid */
+.mobile-acc-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  overflow: hidden;
+  transition: grid-template-rows var(--transition-slow);
+}
+.mobile-acc.open .mobile-acc-body { grid-template-rows: 1fr; }
+.mobile-acc-body-inner { overflow: hidden; }
+
+.mobile-link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  padding: 13px 28px;
+  border-top: 1px solid var(--border);
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  transition: color var(--transition-base), background var(--transition-base);
+}
+.mobile-acc-body-inner .mobile-link:first-child { border-top: none; }
+.mobile-link:hover { color: var(--text); background: var(--accent-glow); }
+.mobile-link--cta { color: var(--text); font-weight: 600; }
+
+.mobile-link-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px; height: 24px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--border-mid);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+.mobile-link:hover .mobile-link-icon { border-color: var(--border-strong); color: var(--text); }
+
+.mobile-link-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.4;
+}
+.mobile-link-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  color: var(--text-dim);
+  margin-top: 2px;
 }
 
 @media (max-width: 700px) {
   .nav-dropdowns  { display: none; }
   .nav-hamburger  { display: flex; }
-  .mobile-menu    { display: flex; }
+  .mobile-menu    { display: block; }
 }
 </style>

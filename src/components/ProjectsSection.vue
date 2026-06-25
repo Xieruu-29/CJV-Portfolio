@@ -11,50 +11,53 @@
           :style="{ transitionDelay: i * 80 + 'ms' }">
           <div class="flip-card"
             :class="{ flipped: flipped[i] }"
-            @mouseenter="flipped[i] = true"
-            @mouseleave="flipped[i] = false"
-            @touchstart.prevent="flipped[i] = !flipped[i]">
-          <div class="flip-inner">
-            <!-- Front -->
-            <div class="flip-front">
-              <!-- Subtle star cluster BG per card -->
-              <div class="card-galaxy" aria-hidden="true">
-                <span v-for="n in 12" :key="n" class="card-star"
-                  :style="{ top: Math.random() * 100 + '%', left: Math.random() * 100 + '%', opacity: Math.random() * 0.4 + 0.1, width: Math.random() * 2 + 1 + 'px', height: Math.random() * 2 + 1 + 'px' }">
-                </span>
+            @mouseenter="handleMouseEnter(i)"
+            @mouseleave="handleMouseLeave(i)"
+            @touchstart="handleCardTouch($event, i)">
+            <div class="flip-inner">
+              <!-- Front -->
+              <div class="flip-front">
+                <div class="card-galaxy" aria-hidden="true">
+                  <span v-for="n in 12" :key="n" class="card-star"
+                    :style="{ top: Math.random() * 100 + '%', left: Math.random() * 100 + '%', opacity: Math.random() * 0.4 + 0.1, width: Math.random() * 2 + 1 + 'px', height: Math.random() * 2 + 1 + 'px' }">
+                  </span>
+                </div>
+                <div class="project-top">
+                  <div class="project-index">{{ String(i + 1).padStart(2, '0') }}</div>
+                  <div class="project-links">
+                    <a v-if="project.live" :href="project.live" target="_blank" rel="noopener noreferrer"
+                      class="icon-link" title="Live demo"
+                      @touchstart.stop>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+                    </a>
+                  </div>
+                </div>
+                <h3 class="project-name">{{ project.name }}</h3>
+                <p class="project-desc">{{ project.description }}</p>
+                <div class="flip-hint">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6M3 12a9 9 0 0115-6.7L21 8M3 22v-6h6M21 12a9 9 0 01-15 6.7L3 16"/></svg>
+                  {{ isTouchDevice ? 'Tap to see stack' : 'Hover to see stack' }}
+                </div>
               </div>
-              <div class="project-top">
-                <div class="project-index">{{ String(i + 1).padStart(2, '0') }}</div>
-                <div class="project-links">
-                  <a v-if="project.live" :href="project.live" target="_blank" rel="noopener noreferrer" class="icon-link" title="Live demo">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+
+              <!-- Back -->
+              <div class="flip-back">
+                <p class="back-label">Tech Stack</p>
+                <div class="stack-list">
+                  <span v-for="tech in project.stack" :key="tech" class="stack-item">
+                    <span class="stack-bullet"></span>{{ tech }}
+                  </span>
+                </div>
+                <div class="back-links">
+                  <a v-if="project.live" :href="project.live" target="_blank" rel="noopener noreferrer"
+                    class="back-link"
+                    @touchstart.stop>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+                    Live Demo
                   </a>
                 </div>
               </div>
-              <h3 class="project-name">{{ project.name }}</h3>
-              <p class="project-desc">{{ project.description }}</p>
-              <div class="flip-hint">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6M3 12a9 9 0 0115-6.7L21 8M3 22v-6h6M21 12a9 9 0 01-15 6.7L3 16"/></svg>
-                Hover to see stack
-              </div>
             </div>
-
-            <!-- Back -->
-            <div class="flip-back">
-              <p class="back-label">Tech Stack</p>
-              <div class="stack-list">
-                <span v-for="tech in project.stack" :key="tech" class="stack-item">
-                  <span class="stack-bullet"></span>{{ tech }}
-                </span>
-              </div>
-              <div class="back-links">
-                <a v-if="project.live" :href="project.live" target="_blank" rel="noopener noreferrer" class="back-link">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
-                  Live Demo
-                </a>
-              </div>
-            </div>
-          </div>
           </div>
         </div>
       </div>
@@ -67,6 +70,26 @@ import { ref, onMounted } from 'vue'
 
 const sectionEl = ref(null)
 const flipped = ref([false, false, false])
+const isTouchDevice = ref(false)
+
+let lastTouchTime = 0
+
+const handleMouseEnter = (i) => {
+  if (Date.now() - lastTouchTime < 500) return
+  flipped.value[i] = true
+}
+
+const handleMouseLeave = (i) => {
+  if (Date.now() - lastTouchTime < 500) return
+  flipped.value[i] = false
+}
+
+const handleCardTouch = (e, i) => {
+  if (e.target.closest('a')) return
+  e.preventDefault()
+  lastTouchTime = Date.now()
+  flipped.value[i] = !flipped.value[i]
+}
 
 const projects = [
   {
@@ -93,6 +116,8 @@ const projects = [
 ]
 
 onMounted(() => {
+  isTouchDevice.value = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+
   const reveals = sectionEl.value?.querySelectorAll('.reveal') || []
   const ro = new IntersectionObserver(
     (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible') }),
@@ -133,6 +158,10 @@ onMounted(() => {
   min-height: 340px;
   perspective: 1200px;
   cursor: pointer;
+  transition: transform var(--transition-base);
+}
+.flip-card:hover {
+  transform: translateY(-4px);
 }
 
 .flip-inner {
@@ -160,6 +189,29 @@ onMounted(() => {
 
 .flip-front {
   background: var(--surface);
+  /* Back face is hidden by default, so disable its pointer events */
+  pointer-events: auto;
+}
+
+/* When flipped: front goes behind, disable its touches so back link works */
+.flip-card.flipped .flip-front {
+  pointer-events: none;
+}
+
+/* Back is rotated away by default, disable touches until flipped */
+.flip-back {
+  pointer-events: none;
+}
+
+/* When flipped: back comes forward, enable its touches */
+.flip-card.flipped .flip-back {
+  pointer-events: auto;
+}
+
+.flip-card:hover .flip-front,
+.flip-card:hover .flip-back {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
 }
 
 .flip-back {
@@ -275,4 +327,9 @@ onMounted(() => {
   pointer-events: all; z-index: 10; position: relative;
 }
 .back-link:hover { color: var(--text); }
+
+@media (max-width: 700px) {
+  .container { text-align: center; }
+  .flip-front, .flip-back { text-align: left; }
+}
 </style>

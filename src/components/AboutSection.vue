@@ -350,8 +350,21 @@ onMounted(() => {
 }
 
 @media (max-width: 700px) {
+  .container { text-align: center; }
+
   .about-grid { grid-template-columns: 1fr; gap: 40px; }
-  .profile-col { max-width: 210px; }
-  .about-stats { flex-wrap: wrap; gap: 24px; }
+
+  .profile-col { max-width: 210px; margin: 0 auto; }
+  .identity-block { text-align: center; }
+  .meta-row { justify-content: center; gap: 16px; }
+
+  .about-text { text-align: left; max-width: 460px; margin: 0 auto; }
+
+  .about-stats { justify-content: center; flex-wrap: wrap; gap: 28px; }
+  .stat { align-items: center; }
+  .stat-bar { margin-left: auto; margin-right: auto; }
+
+  .tag-cloud { text-align: center; }
+  .tags-wrap { justify-content: center; }
 }
 </style>

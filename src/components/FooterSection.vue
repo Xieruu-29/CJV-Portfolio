@@ -224,4 +224,29 @@ const socialLinks = [
   font-size: 10px; font-weight: 400;
   color: var(--text-dim); letter-spacing: 0.06em;
 }
+
+@media (max-width: 700px) {
+  .footer-atom-divider { padding: 40px 0 52px; }
+
+  .footer-inner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 48px;
+    margin-bottom: 56px;
+  }
+
+  .footer-cta-block { width: 100%; display: flex; flex-direction: column; align-items: center; }
+  .footer-sub { margin-left: auto; margin-right: auto; }
+
+  .footer-links-block { width: 100%; display: flex; flex-direction: column; align-items: center; }
+  .footer-socials {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    gap: 16px 28px;
+    justify-content: center;
+  }
+
+  .footer-bottom { flex-direction: column; text-align: center; gap: 10px; }
+}
 </style>

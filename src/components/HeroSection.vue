@@ -455,7 +455,32 @@ onMounted(() => {
 }
 
 @media (max-width: 700px) {
-  .hero-scroll-hint, .coord-readout { display: none; }
   .orbit-bg { opacity: 0.08; right: -160px; }
+
+  .hero {
+    flex-direction: column;
+    justify-content: center;
+    gap: 36px;
+  }
+
+  .hero-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .hero-badge { margin-bottom: 28px; }
+  .hero-name { margin-bottom: 20px; }
+  .hero-title { margin-bottom: 18px; }
+  .hero-bio { margin-left: auto; margin-right: auto; margin-bottom: 36px; }
+  .hero-actions { justify-content: center; }
+
+  /* Scroll hint + coordinates re-flow below the content instead of pinning to viewport corners */
+  .hero-scroll-hint,
+  .coord-readout {
+    position: static;
+  }
+  .coord-readout { order: 1; }
+  .hero-scroll-hint { order: 2; }
 }
 </style>

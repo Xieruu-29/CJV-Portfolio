@@ -450,4 +450,13 @@ onBeforeUnmount(() => {
 .lightbox-fade-enter-from .cert-lightbox-content {
   transform: scale(0.92);
 }
+
+@media (max-width: 700px) {
+  .container { text-align: center; }
+
+  .filter-bar { justify-content: center; }
+  .cert-count { margin-left: 0; width: 100%; text-align: center; order: 99; }
+
+  .cert-grid { grid-template-columns: 1fr; }
+}
 </style>
