@@ -7,7 +7,6 @@ export default async function handler(req) {
 
   const { messages, system } = await req.json()
 
-  // Convert messages format for Gemini
   const contents = messages.map(m => ({
     role: m.role === 'assistant' ? 'model' : 'user',
     parts: [{ text: m.content }]
@@ -26,13 +25,10 @@ export default async function handler(req) {
   )
 
   const data = await response.json()
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "Sorry, I couldn't respond right now."
 
-  // Return in same shape your Vue component expects
-  return new Response(JSON.stringify({
-    content: [{ type: 'text', text }]
-  }), {
-    status: 200,
+  // ✅ Return the full raw response so we can see what Gemini is saying
+  return new Response(JSON.stringify(data), {
+    status: response.status,
     headers: { 'Content-Type': 'application/json' }
   })
 }
