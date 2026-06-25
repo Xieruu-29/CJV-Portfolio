@@ -3,30 +3,27 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  try {
-    const { messages, system } = req.body
+  const { messages, system } = req.body
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: 'nvidia/nemotron-3-super-120b-a12b:free',
-        messages: [
-          { role: 'system', content: system },
-          ...messages
-        ]
-      })
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`
+    },
+    body: JSON.stringify({
+      model: 'nvidia/nemotron-3-super-120b-a12b:free',
+      messages: [
+        { role: 'system', content: system },
+        ...messages
+      ]
     })
+  })
 
-    const data = await response.json()
+  const data = await response.json()
+  const text = data.choices?.[0]?.message?.content ?? "Sorry, I couldn't respond right now."
 
-    // Return full raw response for debugging
-    return res.status(200).json(data)
-
-  } catch (e) {
-    return res.status(500).json({ error: e.message })
-  }
+  return res.status(200).json({
+    content: [{ type: 'text', text }]
+  })
 }
